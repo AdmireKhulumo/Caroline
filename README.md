@@ -30,3 +30,6 @@ The whole premise of Caroline is to be an interesting way to learn new concepts.
 * Keeping track of the conversation using a Queue
 * Modularising the code and adding more features
 * Listening in the background (no explicit launch)
+
+
+*This current version of Caroline was inspired by [Programming Hero](https://www.youtube.com/watch?v=AWvsXxDtEkU).
