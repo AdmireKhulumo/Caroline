@@ -1,5 +1,6 @@
+from typing import List
+
 import speech_recognition as sr
-import pyttsx3 as tts
 import pywhatkit as pwk
 import datetime as dt
 import wikipedia as wiki
@@ -7,28 +8,11 @@ import pyjokes as jokes
 from compliments import compliments
 import random
 import sys
+from caroline_speech import talk
+from conversation import track_conversation, recall_conversation
 
 # initialise listener event
 listener = sr.Recognizer()
-
-# initialise text to speech engine
-engine = tts.init()
-# set speed to 75%
-engine.setProperty('rate', 75)
-# set voice to female
-engine.setProperty('voice', "com.apple.speech.synthesis.voice.samantha")
-
-
-# Caroline's text response
-def text_reply(text: str) -> None:
-    print('Caroline 👱🏾: ' + text)
-
-
-# Caroline's audio response
-def talk(text: str) -> None:
-    text_reply(text)
-    engine.say(text)
-    engine.runAndWait()
 
 
 # get a command from person
@@ -45,6 +29,8 @@ def get_command() -> str:
             # check if name is mentioned
             if 'caroline' in command:
                 print("You 🤓: " + command)
+                # track this conversation point
+                track_conversation('user', command)
                 # remove name from command
                 command = command.replace('caroline', '')
                 # return spoken command to caller
@@ -54,7 +40,11 @@ def get_command() -> str:
                 return 'empty'
     except Exception as e:
         print(e)
-        print(e.__doc__)
+
+
+# checks if any word in a list is in the command
+def check_in(words: List[str], command: str) -> bool:
+    return any(x in command for x in words)
 
 
 def start_caroline():
@@ -85,10 +75,15 @@ def start_caroline():
     # googling feature
     elif 'search' in command:
         query: str = command.replace('search', '')
+        talk('Searching for ' + query)
         pwk.search(query)
     elif 'why' in command and 'lonely' in command:
         talk('You code too much, you have no life. Live a little! '
              'Woza weekend should not be spent at the lab! Improve!')
+    # recount last conversation
+    elif check_in(['recount', 'recall', 'repeat'], command) and check_in(['talk', 'conversation'], command):
+        talk("Okay, let me do that.")
+        recall_conversation()
     # stop execution
     elif 'bye' in command:
         talk("Awesome, catch you later!")
